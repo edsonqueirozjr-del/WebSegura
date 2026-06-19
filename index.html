@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposta Técnica - Evolução dos Painéis Web</title>
+  <style>
+    :root {
+      --bg: #eef3ee;
+      --card: #ffffff;
+      --text: #15241b;
+      --muted: #627066;
+      --green: #1f7a3a;
+      --green-dark: #115327;
+      --green-soft: #e3f3e7;
+      --line: #dce6de;
+      --warning: #f3a712;
+      --danger: #c0392b;
+      --blue: #2457a6;
+      --shadow: 0 18px 45px rgba(17, 83, 39, 0.12);
+      --radius: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(31, 122, 58, 0.18), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(36, 87, 166, 0.12), transparent 25%),
+        linear-gradient(135deg, #f6faf6, var(--bg));
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(246, 250, 246, 0.82);
+      border-bottom: 1px solid rgba(220, 230, 222, 0.75);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 800;
+      color: var(--green-dark);
+      letter-spacing: -0.3px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--green), #72b36b);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      box-shadow: 0 12px 25px rgba(31, 122, 58, 0.25);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-weight: 700;
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 10px 25px rgba(31, 122, 58, 0.18);
+      transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: var(--green-dark);
+      box-shadow: 0 12px 30px rgba(31, 122, 58, 0.25);
+    }
+
+    button.secondary {
+      background: #fff;
+      color: var(--green-dark);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .deck {
+      width: 100%;
+      min-height: 100vh;
+      padding: 104px 28px 34px;
+      display: grid;
+      place-items: center;
+    }
+
+    .slide {
+      width: min(1120px, 100%);
+      min-height: 660px;
+      display: none;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(220, 230, 222, 0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 52px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide.active {
+      display: block;
+      animation: appear 0.35s ease;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .slide::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      bottom: -110px;
+      width: 310px;
+      height: 310px;
+      background: radial-gradient(circle, rgba(31, 122, 58, 0.12), transparent 67%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      border: 1px solid #c8e6cf;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: clamp(38px, 6vw, 70px);
+      line-height: 0.97;
+      margin: 0 0 22px;
+      letter-spacing: -2.6px;
+      color: var(--text);
+    }
+
+    h2 {
+      font-size: clamp(31px, 4vw, 48px);
+      line-height: 1.05;
+      margin: 0 0 22px;
+      letter-spacing: -1.4px;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 19px;
+      color: var(--green-dark);
+    }
+
+    p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.55;
+    }
+
+    .lead {
+      max-width: 850px;
+      font-size: 24px;
+      color: #3c4d41;
+    }
+
+    .highlight {
+      color: var(--green-dark);
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 26px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 24px;
+      min-height: 155px;
+      box-shadow: 0 12px 28px rgba(20, 55, 31, 0.06);
+    }
+
+    .card .icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: var(--green-soft);
+      display: grid;
+      place-items: center;
+      font-size: 23px;
+      margin-bottom: 16px;
+    }
+
+    .card p {
+      font-size: 16px;
+      margin-bottom: 0;
+    }
+
+    .risk {
+      border-left: 6px solid var(--warning);
+    }
+
+    .danger {
+      border-left: 6px solid var(--danger);
+    }
+
+    .safe {
+      border-left: 6px solid var(--green);
+    }
+
+    .flow {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .step {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px 16px;
+      text-align: center;
+      position: relative;
+      min-height: 145px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--green);
+      font-size: 26px;
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .step strong {
+      display: block;
+      color: var(--green-dark);
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .check {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 17px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      color: #344439;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+
+    .check::before {
+      content: "✓";
+      flex: 0 0 auto;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-weight: 900;
+    }
+
+    .quote {
+      margin-top: 34px;
+      background: linear-gradient(135deg, var(--green-dark), var(--green));
+      color: #fff;
+      border-radius: 26px;
+      padding: 32px;
+      font-size: 25px;
+      line-height: 1.35;
+      font-weight: 800;
+      box-shadow: 0 18px 45px rgba(31, 122, 58, 0.22);
+    }
+
+    .quote small {
+      display: block;
+      margin-top: 10px;
+      font-size: 15px;
+      opacity: 0.82;
+      font-weight: 600;
+    }
+
+    .footer {
+      position: absolute;
+      left: 52px;
+      right: 52px;
+      bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #849189;
+      font-size: 13px;
+      z-index: 3;
+    }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      top: 72px;
+      height: 4px;
+      background: var(--green);
+      width: 0%;
+      z-index: 30;
+      transition: width 0.25s ease;
+    }
+
+    .dots {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 25;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #b8c5bb;
+      border: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    .dot.active {
+      width: 10px;
+      height: 26px;
+      border-radius: 999px;
+      background: var(--green);
+    }
+
+    .mini {
+      font-size: 15px;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      margin-top: 26px;
+    }
+
+    .table th, .table td {
+      padding: 17px 18px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 16px;
+    }
+
+    .table th {
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      font-size: 13px;
+      font-weight: 800;
+      margin: 2px 4px 2px 0;
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        height: auto;
+        padding: 12px 14px;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .deck {
+        padding: 112px 14px 22px;
+      }
+
+      .slide {
+        min-height: auto;
+        padding: 30px 22px 70px;
+        border-radius: 22px;
+      }
+
+      .grid, .grid.two, .checklist, .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .step:not(:last-child)::after {
+        content: "↓";
+        right: 50%;
+        top: auto;
+        bottom: -24px;
+        transform: translateX(50%);
+      }
+
+      .flow {
+        gap: 28px;
+      }
+
+      .footer {
+        left: 22px;
+        right: 22px;
+      }
+
+      .dots {
+        display: none;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      h1 {
+        letter-spacing: -1.3px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .topbar, .dots, .progress {
+        display: none;
+      }
+
+      .deck {
+        display: block;
+        padding: 0;
+      }
+
+      .slide {
+        display: block !important;
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+        min-height: 100vh;
+        page-break-after: always;
+      }
+
+      button {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">S</div>
+      <span>Evolução dos Painéis Web · Segurança e Banco de Dados</span>
+    </div>
+    <div class="actions">
+      <button class="secondary" onclick="prevSlide()">← Anterior</button>
+      <button onclick="nextSlide()">Próximo →</button>
+      <button class="secondary" onclick="window.print()">Imprimir / PDF</button>
+    </div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+  <div class="dots" id="dots"></div>
+
+  <main class="deck">
+
+    <section class="slide active">
+      <span class="tag">Apresentação para TI</span>
+      <h1>Do protótipo em HTML para uma solução segura</h1>
+      <p class="lead">
+        Hoje eu desenvolvo páginas web funcionais para apoiar o negócio.
+        O próximo passo é transformar esses painéis em aplicações internas com
+        <span class="highlight">login real, banco de dados, permissões, logs e segurança</span>.
+      </p>
+
+      <div class="quote">
+        “Eu faço o front-end funcional. Para virar sistema corporativo, preciso do apoio do TI com backend, banco de dados e segurança.”
+        <small>Mensagem central para alinhamento técnico</small>
+      </div>
+
+      <div class="footer">
+        <span>Marketing Estratégico · BI · CRM</span>
+        <span>Slide <b class="current">1</b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag">1. O que faço hoje</span>
+      <h2>Painéis e páginas web em HTML, CSS e JavaScript</h2>
+      <p>
+        As soluções atuais são páginas web criadas para resolver necessidades rápidas do negócio:
+        visualização de dados, ranking, administração simples, importação/exportação e compartilhamento.
+      </p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="icon">🧱</div>
+          <h3>HTML</h3>
+          <p>Estrutura da tela: títulos, cards, tabelas, botões e seções.</p>
+        </div>
+        <div class="card">
+          <div class="icon">🎨</div>
+          <h3>CSS</h3>
+          <p>Visual da página: cores, layout, responsividade e animações.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⚙️</div>
+          <h3>JavaScript</h3>
+          <p>Comportamento: cliques, filtros, upload de Excel, rankings e interações.</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Objetivo: transformar ideias em protótipos úteis rapidamente</span>
+        <span>Slide <b class="current"></b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag">2. Como funciona hoje</span>
+      <h2>Modelo atual: página estática no navegador</h2>
+      <p>
+        Quando a aplicação está apenas em HTML, CSS e JavaScript, grande parte da lógica fica no navegador do usuário.
+        Isso é bom para protótipos, mas limitado para uso corporativo com dados sensíveis.
+      </p>
+
+      <div class="flow">
+        <div class="step">
+          <strong>Arquivo HTML</strong>
+          <span>Página publicada ou enviada para acesso</span>
+        </div>
+        <div class="step">
+          <strong>Navegador</strong>
+          <span>Usuário abre a página</span>
+        </div>
+        <div class="step">
+          <strong>JavaScript</strong>
+          <span>Executa filtros, botões e regras</span>
+        </div>
+        <div class="step">
+          <strong>Arquivo/Excel</strong>
+          <span>Dados entram manualmente</span>
+        </div>
+        <div class="step">
+          <strong>Resultado</strong>
+          <span>Painel funciona, mas sem camada segura real</span>
+        </div>
+      </div>
+
+      <p class="mini">
+        Exemplo: GitHub Pages é ótimo para publicar páginas estáticas, mas não substitui backend, banco de dados, autenticação e gestão de permissões.
+      </p>
+
+      <div class="footer">
+        <span>Modelo ideal para protótipo, não para regra sensível</span>
+        <span>Slide <b class="current"></b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag">3. Limitações e riscos</span>
+      <h2>O que não deve ficar somente no HTML</h2>
+      <p>
+        Código de front-end pode ser visualizado, copiado ou alterado por pessoas com conhecimento técnico.
+        Por isso, dados e regras críticas precisam ficar protegidos em servidor, API e banco de dados.
+      </p>
+
+      <div class="grid">
+        <div class="card danger">
+          <h3>Senha simulada</h3>
+          <p>Usuário e senha dentro do HTML não são segurança real. Podem ser vistos no código.</p>
+        </div>
+        <div class="card danger">
+          <h3>Dados sensíveis</h3>
+          <p>Informações comerciais, ranking, clientes ou regras internas não devem ficar expostas no arquivo.</p>
+        </div>
+        <div class="card risk">
+          <h3>Sem histórico</h3>
+          <p>Alterações feitas na tela podem se perder ou não gerar rastreabilidade.</p>
+        </div>
+        <div class="card risk">
+          <h3>Sem perfil de acesso</h3>
+          <p>Não há separação real entre administrador, gestor e visualizador.</p>
+        </div>
+        <div class="card risk">
+          <h3>Sem logs</h3>
+          <p>Fica difícil saber quem acessou, quem alterou e quando alterou.</p>
+        </div>
+        <div class="card risk">
+          <h3>Sem backup central</h3>
+          <p>Dados em arquivo ou navegador não garantem continuidade e governança.</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Resumo: o front-end mostra; o backend protege</span>
+        <span>Slide <b class="current"></b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag">4. Modelo recomendado</span>
+      <h2>Aplicação com front-end, API e banco de dados</h2>
+      <p>
+        A evolução ideal é manter a tela simples e bonita, mas conectar a aplicação a uma camada segura
+        controlada pelo TI.
+      </p>
+
+      <div class="flow">
+        <div class="step">
+          <strong>Usuário</strong>
+          <span>Acessa a aplicação</span>
+        </div>
+        <div class="step">
+          <strong>Login seguro</strong>
+          <span>Autenticação real</span>
+        </div>
+        <div class="step">
+          <strong>Front-end</strong>
+          <span>HTML, CSS e JavaScript</span>
+        </div>
+        <div class="step">
+          <strong>API / Backend</strong>
+          <span>Regras, validações e permissões</span>
+        </div>
+        <div class="step">
+          <strong>Banco de dados</strong>
+          <span>Dados, histórico, logs e backup</span>
+        </div>
+      </div>
+
+      <div class="quote">
+        “O HTML deve ser a interface. A segurança e os dados precisam estar em uma camada controlada pelo TI.”
+      </div>
+
+      <div class="footer">
+        <span>Modelo mais seguro, escalável e governado</span>
+        <span>Slide <b class="current"></b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag">5. O que preciso do TI</span>
+      <h2>Solicitações objetivas</h2>
+      <p>
+        A ideia não é substituir o TI. É criar protótipos e evoluir os que forem úteis para um padrão seguro da empresa.
+      </p>
+
+      <div class="checklist">
+        <div class="check">Definir ambiente seguro para hospedar as aplicações internas.</div>
+        <div class="check">Criar ou indicar banco de dados adequado para os painéis.</div>
+        <div class="check">Implementar login real, preferencialmente integrado ao padrão da empresa.</div>
+        <div class="check">Definir perfis de acesso: administrador, gestor, visualizador etc.</div>
+        <div class="check">Criar API para o front-end buscar, gravar e atualizar dados.</div>
+        <div class="check">Garantir backup, logs de acesso e histórico de alterações.</div>
+        <div class="check">Definir o que pode ficar no GitHub Pages e o que precisa ir para ambiente interno.</div>
+        <div class="check">Orientar padrões mínimos de segurança antes de publicar novos painéis.</div>
+      </div>
+
+      <div class="footer">
+        <span>Pedido: apoio técnico para transformar protótipos em aplicações confiáveis</span>
+        <span>Slide <b class="current"></b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag">6. Comparativo</span>
+      <h2>Atual x recomendado</h2>
+      <p>
+        O objetivo é manter a agilidade do desenvolvimento, mas reduzir riscos e melhorar a governança dos dados.
+      </p>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ponto</th>
+            <th>Modelo atual</th>
+            <th>Modelo recomendado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Acesso</strong></td>
+            <td>Link direto ou senha simulada</td>
+            <td>Login real com usuário autenticado</td>
+          </tr>
+          <tr>
+            <td><strong>Dados</strong></td>
+            <td>Excel, HTML ou navegador</td>
+            <td>Banco de dados centralizado</td>
+          </tr>
+          <tr>
+            <td><strong>Permissões</strong></td>
+            <td>Controle limitado no front-end</td>
+            <td>Controle por perfil no backend</td>
+          </tr>
+          <tr>
+            <td><strong>Alterações</strong></td>
+            <td>Pouca rastreabilidade</td>
+            <td>Logs, histórico e auditoria</td>
+          </tr>
+          <tr>
+            <td><strong>Segurança</strong></td>
+            <td>Código visível no navegador</td>
+            <td>Regras sensíveis protegidas no servidor</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="footer">
+        <span>Evolução sem perder velocidade</span>
+        <span>Slide <b class="current"></b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag">7. Prioridades</span>
+      <h2>Primeiros passos sugeridos</h2>
+      <p>
+        Para começar de forma prática, podemos priorizar uma aplicação piloto e definir um padrão para os próximos painéis.
+      </p>
+
+      <div class="grid two">
+        <div class="card safe">
+          <h3>Fase 1 · Diagnóstico</h3>
+          <p>Mapear quais painéis existem, quais dados usam, quem acessa e quais riscos precisam ser tratados.</p>
+        </div>
+        <div class="card safe">
+          <h3>Fase 2 · Padrão técnico</h3>
+          <p>Definir ambiente, banco, autenticação, API e regras mínimas de publicação.</p>
+        </div>
+        <div class="card safe">
+          <h3>Fase 3 · Projeto piloto</h3>
+          <p>Escolher um painel para transformar em aplicação segura com banco e login real.</p>
+        </div>
+        <div class="card safe">
+          <h3>Fase 4 · Escala</h3>
+          <p>Reaplicar o padrão nos próximos projetos e documentar o fluxo de desenvolvimento.</p>
+        </div>
+      </div>
+
+      <div class="quote">
+        Resultado esperado: mais velocidade para o negócio, com mais segurança para a empresa.
+      </div>
+
+      <div class="footer">
+        <span>Proposta de implantação gradual</span>
+        <span>Slide <b class="current"></b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag">8. Mensagem final</span>
+      <h2>O pedido é parceria com o TI</h2>
+      <p class="lead">
+        Eu consigo criar telas, lógica visual, filtros, rankings e protótipos úteis para o negócio.
+        Mas para dados corporativos, precisamos evoluir para uma estrutura com segurança, banco de dados e governança.
+      </p>
+
+      <div class="grid two">
+        <div class="card">
+          <h3>O que eu continuo fazendo</h3>
+          <p>
+            Protótipos, layout, experiência do usuário, regras de visualização, dashboards em HTML e validação com a área de negócio.
+          </p>
+        </div>
+        <div class="card">
+          <h3>O que preciso do TI</h3>
+          <p>
+            Backend, banco de dados, autenticação, permissões, ambiente seguro, logs, backup e padrões de publicação.
+          </p>
+        </div>
+      </div>
+
+      <div class="quote">
+        “Vamos transformar soluções rápidas em aplicações internas seguras, escaláveis e confiáveis.”
+      </div>
+
+      <div class="footer">
+        <span>Obrigado</span>
+        <span>Slide <b class="current"></b>/<b class="total"></b></span>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dotsContainer = document.getElementById("dots");
+    const progress = document.getElementById("progress");
+    let index = 0;
+
+    slides.forEach((_, i) => {
+      const dot = document.createElement("button");
+      dot.className = "dot";
+      dot.title = `Ir para slide ${i + 1}`;
+      dot.onclick = () => goToSlide(i);
+      dotsContainer.appendChild(dot);
+    });
+
+    function update() {
+      slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+      document.querySelectorAll(".dot").forEach((dot, i) => dot.classList.toggle("active", i === index));
+      document.querySelectorAll(".current").forEach(el => el.textContent = index + 1);
+      document.querySelectorAll(".total").forEach(el => el.textContent = slides.length);
+      progress.style.width = `${((index + 1) / slides.length) * 100}%`;
+    }
+
+    function nextSlide() {
+      index = Math.min(index + 1, slides.length - 1);
+      update();
+    }
+
+    function prevSlide() {
+      index = Math.max(index - 1, 0);
+      update();
+    }
+
+    function goToSlide(i) {
+      index = i;
+      update();
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        nextSlide();
+      }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        prevSlide();
+      }
+      if (event.key === "Home") {
+        goToSlide(0);
+      }
+      if (event.key === "End") {
+        goToSlide(slides.length - 1);
+      }
+    });
+
+    update();
+  </script>
+</body>
+</html>
